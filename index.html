@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Asistente Legal RD — Formulario de Evaluación</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <style>
+    :root { --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#e9efff; --accent:#4ea1ff; --danger:#ff5a6a; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, #0b1220); color:var(--text); }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 32px 16px 64px; }
+    .card { background: rgba(17,26,46,.92); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:24px; box-shadow: 0 10px 40px rgba(0,0,0,.35); }
+    h1 { margin:0 0 6px; font-size: 28px; letter-spacing:.2px; }
+    p { margin:0 0 18px; color: var(--muted); line-height:1.5; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+    label { display:block; font-weight: 600; margin: 0 0 8px; }
+    .hint { font-weight: 500; color: var(--muted); font-size: 13px; margin-top:6px; }
+    input, select, textarea {
+      width:100%; box-sizing:border-box; padding:12px 12px;
+      background: rgba(255,255,255,.04); color: var(--text);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+      outline: none;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: rgba(78,161,255,.7); box-shadow: 0 0 0 4px rgba(78,161,255,.15); }
+    .section { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+    .row { margin-bottom: 14px; }
+    .actions { display:flex; gap:12px; align-items:center; margin-top: 18px; flex-wrap: wrap; }
+    button {
+      border:0; border-radius: 14px; padding: 12px 16px; font-weight: 700; cursor:pointer;
+      background: linear-gradient(135deg, rgba(78,161,255,1), rgba(120,95,255,1));
+      color: white;
+    }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    .status { padding: 10px 12px; border-radius: 12px; border:1px solid rgba(255,255,255,.12); color: var(--muted); }
+    .status.ok { border-color: rgba(62, 230, 168, .35); color: rgba(62,230,168, .95); }
+    .status.err { border-color: rgba(255, 90, 106, .45); color: rgba(255,90,106, .95); }
+    .legal { display:flex; gap:10px; align-items:flex-start; }
+    .legal input { width:auto; margin-top: 4px; }
+    .small { font-size: 12px; color: var(--muted); }
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; background: rgba(78,161,255,.15); color: rgba(78,161,255,1); border:1px solid rgba(78,161,255,.25); font-size: 12px; font-weight:700; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="badge">Asistente Legal RD</div>
+      <h1>Formulario de evaluación inicial</h1>
+      <p>Complete este formulario (2–3 minutos). La información será revisada por el equipo legal.</p>
+
+      <!-- IMPORTANTE: method/post + enctype evita submits raros -->
+      <form id="legalForm" method="post" enctype="multipart/form-data" novalidate>
+        <div class="section">
+          <h2 style="margin:0 0 10px; font-size:18px;">Datos del cliente</h2>
+
+          <div class="grid">
+            <div class="row">
+              <label for="nombre">Nombre completo *</label>
+              <input id="nombre" name="nombre" type="text" required placeholder="Juan Pérez" />
+            </div>
+
+            <div class="row">
+              <label for="telefono">Teléfono (WhatsApp) *</label>
+              <input id="telefono" name="telefono" type="tel" required placeholder="8091234567" />
+              <div class="hint">Incluya 809 / 829 / 849.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <label for="email">Correo electrónico *</label>
+            <input id="email" name="email" type="email" required placeholder="correo@ejemplo.com" />
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 style="margin:0 0 10px; font-size:18px;">Tipo de caso</h2>
+
+          <div class="row">
+            <label for="tipo_caso">Seleccione una opción *</label>
+            <select id="tipo_caso" name="tipo_caso" required>
+              <option value="" selected disabled>— Seleccionar —</option>
+              <option>Laboral</option>
+              <option>Penal</option>
+              <option>Civil</option>
+              <option>Familia</option>
+              <option>Migratorio</option>
+              <option>Inmobiliario</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 style="margin:0 0 10px; font-size:18px;">¿Qué pasó?</h2>
+
+          <div class="row">
+            <label for="descripcion">Describa brevemente su situación *</label>
+            <textarea id="descripcion" name="descripcion" required
+              placeholder="Cuéntenos qué ocurrió, cuándo y qué espera lograr."></textarea>
+          </div>
+
+          <div class="grid">
+            <div class="row">
+              <label for="audio">Audio (opcional, máx. 2 min)</label>
+              <input id="audio" name="audio" type="file" accept="audio/*" />
+              <div class="hint">Puede grabarlo con su celular y subirlo aquí.</div>
+            </div>
+
+            <div class="row">
+              <label for="documentos">Documentos (opcional)</label>
+              <input id="documentos" name="documentos" type="file" multiple
+                     accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,image/*" />
+              <div class="hint">Ej.: contrato, citación, acta, fotos, etc.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 style="margin:0 0 10px; font-size:18px;">Expectativa</h2>
+
+          <div class="row">
+            <label for="expectativa">¿Qué espera de esta consulta inicial? *</label>
+            <select id="expectativa" name="expectativa" required>
+              <option value="" selected disabled>— Seleccionar —</option>
+              <option>Orientación legal</option>
+              <option>Saber si mi caso procede</option>
+              <option>Representación legal</option>
+              <option>No estoy seguro/a</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="row legal">
+            <input id="legal_ok" name="legal_ok" type="checkbox" required />
+            <label for="legal_ok" style="margin:0;">
+              Confirmo que la información suministrada es veraz y entiendo que este formulario no constituye asesoría legal. *
+              <div class="small">Al enviar, acepta que le contactemos por los medios indicados.</div>
+            </label>
+          </div>
+
+          <input type="hidden" name="origen" value="asistente_legal_rd_web" />
+          <input type="hidden" id="timestamp" name="timestamp" />
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="btnEnviar">Enviar caso</button>
+          <div id="status" class="status">Listo para enviar.</div>
+        </div>
+
+        <p class="small" style="margin-top:14px;">
+          Si tiene una urgencia, indique “URGENTE” al inicio de la descripción.
+        </p>
+
+        <p class="small mono" style="margin-top:10px; opacity:.8;">
+          Endpoint: <span id="endpoint"></span>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Production Webhook (Path: alrd-intake)
+    const N8N_WEBHOOK_URL = "https://curso-n8n-n8n.sjia2i.easypanel.host/webhook/alrd-intake";
+
+    const form = document.getElementById("legalForm");
+    const btn = document.getElementById("btnEnviar");
+    const statusEl = document.getElementById("status");
+    const ts = document.getElementById("timestamp");
+    const endpointEl = document.getElementById("endpoint");
+    if (endpointEl) endpointEl.textContent = N8N_WEBHOOK_URL;
+
+    function setStatus(msg, type) {
+      statusEl.textContent = msg;
+      statusEl.className = "status" + (type ? ` ${type}` : "");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Validación nativa rápida (evita submits raros)
+      if (!form.checkValidity()) {
+        setStatus("❌ Complete los campos obligatorios antes de enviar.", "err");
+        return;
+      }
+
+      ts.value = new Date().toISOString();
+      btn.disabled = true;
+      setStatus("Enviando…", "");
+
+      try {
+        const fd = new FormData(form);
+
+        const res = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          body: fd,
+          mode: "cors",
+        });
+
+        // Siempre leer como texto primero: evita el JSON vacío
+        const rawText = await res.text();
+        const contentType = (res.headers.get("content-type") || "").toLowerCase();
+
+        // Parsear JSON solo si hay body y parece JSON
+        let payload = null;
+        if (rawText && (contentType.includes("application/json") || rawText.trim().startsWith("{"))) {
+          try { payload = JSON.parse(rawText); } catch (_) { payload = null; }
+        }
+
+        if (!res.ok) {
+          const msg = rawText?.trim()
+            ? rawText.trim()
+            : `HTTP ${res.status} ${res.statusText}`;
+          throw new Error(msg);
+        }
+
+        const msgOk =
+          (payload && payload.mensaje) ? payload.mensaje :
+          rawText?.trim() ? rawText.trim() :
+          "✅ Enviado correctamente. En breve nos comunicaremos con usted.";
+
+        setStatus(msgOk, "ok");
+        form.reset();
+
+      } catch (err) {
+        console.error(err);
+        setStatus(`❌ Error: ${err.message}`, "err");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+
