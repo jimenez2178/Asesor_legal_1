@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Asistente Legal RD — Formulario de Evaluación</title>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <style>
     :root { --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#e9efff; --accent:#4ea1ff; --danger:#ff5a6a; }
     body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#070b14, #0b1220); color:var(--text); }
@@ -42,7 +39,6 @@
     .legal input { width:auto; margin-top: 4px; }
     .small { font-size: 12px; color: var(--muted); }
     .badge { display:inline-block; padding:6px 10px; border-radius:999px; background: rgba(78,161,255,.15); color: rgba(78,161,255,1); border:1px solid rgba(78,161,255,.25); font-size: 12px; font-weight:700; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
   </style>
 </head>
 
@@ -53,8 +49,7 @@
       <h1>Formulario de evaluación inicial</h1>
       <p>Complete este formulario (2–3 minutos). La información será revisada por el equipo legal.</p>
 
-      <!-- IMPORTANTE: method/post + enctype evita submits raros -->
-      <form id="legalForm" method="post" enctype="multipart/form-data" novalidate>
+      <form id="legalForm">
         <div class="section">
           <h2 style="margin:0 0 10px; font-size:18px;">Datos del cliente</h2>
 
@@ -156,38 +151,36 @@
         <p class="small" style="margin-top:14px;">
           Si tiene una urgencia, indique “URGENTE” al inicio de la descripción.
         </p>
-
-        <p class="small mono" style="margin-top:10px; opacity:.8;">
-          Endpoint: <span id="endpoint"></span>
-        </p>
       </form>
     </div>
   </div>
 
   <script>
-    // Production Webhook (Path: alrd-intake)
     const N8N_WEBHOOK_URL = "https://curso-n8n-n8n.sjia2i.easypanel.host/webhook/alrd-intake";
 
     const form = document.getElementById("legalForm");
     const btn = document.getElementById("btnEnviar");
     const statusEl = document.getElementById("status");
     const ts = document.getElementById("timestamp");
-    const endpointEl = document.getElementById("endpoint");
-    if (endpointEl) endpointEl.textContent = N8N_WEBHOOK_URL;
 
     function setStatus(msg, type) {
       statusEl.textContent = msg;
       statusEl.className = "status" + (type ? ` ${type}` : "");
     }
 
+    async function readResponse(res) {
+      const text = await res.text();
+      const ct = (res.headers.get("content-type") || "").toLowerCase();
+
+      // Si parece JSON y viene algo, intenta parsear; si está vacío, devuelve texto.
+      if (ct.includes("application/json") && text.trim()) {
+        try { return JSON.parse(text); } catch { return text; }
+      }
+      return text;
+    }
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      // Validación nativa rápida (evita submits raros)
-      if (!form.checkValidity()) {
-        setStatus("❌ Complete los campos obligatorios antes de enviar.", "err");
-        return;
-      }
 
       ts.value = new Date().toISOString();
       btn.disabled = true;
@@ -198,33 +191,19 @@
 
         const res = await fetch(N8N_WEBHOOK_URL, {
           method: "POST",
-          body: fd,
-          mode: "cors",
+          body: fd
         });
 
-        // Siempre leer como texto primero: evita el JSON vacío
-        const rawText = await res.text();
-        const contentType = (res.headers.get("content-type") || "").toLowerCase();
-
-        // Parsear JSON solo si hay body y parece JSON
-        let payload = null;
-        if (rawText && (contentType.includes("application/json") || rawText.trim().startsWith("{"))) {
-          try { payload = JSON.parse(rawText); } catch (_) { payload = null; }
-        }
+        const payload = await readResponse(res);
 
         if (!res.ok) {
-          const msg = rawText?.trim()
-            ? rawText.trim()
-            : `HTTP ${res.status} ${res.statusText}`;
-          throw new Error(msg);
+          const msg = (typeof payload === "string")
+            ? payload
+            : (payload?.message || JSON.stringify(payload));
+          throw new Error(msg || `Error HTTP ${res.status}`);
         }
 
-        const msgOk =
-          (payload && payload.mensaje) ? payload.mensaje :
-          rawText?.trim() ? rawText.trim() :
-          "✅ Enviado correctamente. En breve nos comunicaremos con usted.";
-
-        setStatus(msgOk, "ok");
+        setStatus("✅ Enviado correctamente. En breve nos comunicaremos con usted.", "ok");
         form.reset();
 
       } catch (err) {
@@ -237,4 +216,3 @@
   </script>
 </body>
 </html>
-
